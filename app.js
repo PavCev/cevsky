@@ -371,17 +371,25 @@
 
   function renderData(events) {
     const today = startOfToday();
-    const keepFrom = addDays(today,-(SITE_CONFIG.keepPastDays || 0));
+
+    // Sztywne okno publikacji:
+    // dzisiaj + kolejne dni, maksymalnie 14 dni łącznie.
+    const displayDays = Math.max(1, Number(SITE_CONFIG.displayDays) || 14);
+    const windowEnd = addDays(today, displayDays);
+    windowEnd.setHours(0,0,0,0);
 
     const sorted = [...events]
       .filter(e => Number.isFinite(parseDateTime(e.date,e.time).getTime()))
       .sort((a,b) => parseDateTime(a.date,a.time) - parseDateTime(b.date,b.time));
 
-    const visible = sorted.filter(e =>
-      parseDateTime(e.date,"23:59").getTime() >= keepFrom.getTime()
-    );
+    const visible = sorted.filter(e => {
+      const eventDay = parseDateTime(e.date,"00:00");
+      return eventDay.getTime() >= today.getTime()
+        && eventDay.getTime() < windowEnd.getTime();
+    });
 
-    const upcoming = sorted.filter(e =>
+    // Najbliższy materiał też wybieramy tylko z aktualnego 14-dniowego okna.
+    const upcoming = visible.filter(e =>
       parseDateTime(e.date,e.time).getTime() >= Date.now()
     );
 
@@ -431,9 +439,12 @@
     status.className = "sheet-status";
 
     try {
+      // Parametr _ts zmienia się przy każdym odczycie, żeby przeglądarka
+      // nie trzymała starej odpowiedzi w cache.
       const url =
         `https://docs.google.com/spreadsheets/d/${SITE_CONFIG.sheetId}/gviz/tq` +
-        `?gid=${encodeURIComponent(SITE_CONFIG.sheetGid)}&headers=1`;
+        `?gid=${encodeURIComponent(SITE_CONFIG.sheetGid)}` +
+        `&headers=1&_ts=${Date.now()}`;
 
       const query = new google.visualization.Query(url);
       query.setQuery("select *");
@@ -456,8 +467,19 @@
     google.charts.setOnLoadCallback(() => {
       loadSheet();
 
-      const minutes = Math.max(1, Number(SITE_CONFIG.refreshMinutes) || 2);
+      // Automatyczne odświeżanie w trakcie otwartej strony.
+      const minutes = Math.max(1, Number(SITE_CONFIG.refreshMinutes) || 1);
       setInterval(loadSheet, minutes * 60 * 1000);
+
+      // Po powrocie do karty pobierz harmonogram od razu.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          loadSheet();
+        }
+      });
+
+      // Tak samo po ponownym uaktywnieniu okna przeglądarki.
+      window.addEventListener("focus", loadSheet);
     });
   }
 

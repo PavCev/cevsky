@@ -146,13 +146,13 @@ h1{
   background:rgba(255,255,255,.018);
 }
 .day-header strong{
-  font-size:22px;
-  letter-spacing:-.5px;
+  font-size:28px;
+  letter-spacing:-.7px;
 }
 .day-header span{
-  color:var(--muted);
-  font-size:16px;
-  font-weight:850;
+  color:var(--text);
+  font-size:21px;
+  font-weight:900;
 }
 
 .event{
@@ -193,9 +193,10 @@ h1{
 .event-title{
   overflow:hidden;
   text-overflow:ellipsis;
-  font-size:24px;
-  font-weight:900;
-  line-height:1.28;
+  font-size:30px;
+  font-weight:950;
+  line-height:1.22;
+  letter-spacing:-.45px;
 }
 .event-meta{
   margin-top:8px;
@@ -208,8 +209,15 @@ h1{
 }
 
 .badge{
-  display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;
-  color:white;font-size:10px;font-weight:950;letter-spacing:.04em;text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  padding:7px 12px;
+  border-radius:999px;
+  color:white;
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:.045em;
+  text-transform:uppercase;
 }
 .badge-film{background:var(--blue)}
 .badge-premiera{background:var(--violet)}
@@ -258,8 +266,8 @@ a.open-link:hover{color:#0b0d12;border-color:white;background:white}
   .section-heading{align-items:flex-start;flex-direction:column;gap:7px}
   .status-area{text-align:left}
 
-  .day-header strong{font-size:20px}
-  .day-header span{font-size:15px}
+  .day-header strong{font-size:23px}
+  .day-header span{font-size:18px}
 
   .event{
     grid-template-columns:70px minmax(0,1fr);
@@ -267,7 +275,7 @@ a.open-link:hover{color:#0b0d12;border-color:white;background:white}
     padding:14px;
   }
   .event-time{font-size:24px}
-  .event-title{font-size:21px}
+  .event-title{font-size:24px}
   .open-link{
     grid-column:2;
     justify-self:start;
