@@ -1,5 +1,5 @@
 /*
-  CEVSKY.PL — Google Sheets v3.4
+  CEVSKY.PL — Google Sheets v3.5
 */
 
 const SITE_CONFIG = {

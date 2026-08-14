@@ -146,13 +146,13 @@ h1{
   background:rgba(255,255,255,.018);
 }
 .day-header strong{
-  font-size:28px;
-  letter-spacing:-.7px;
+  font-size:30px;
+  letter-spacing:-.8px;
 }
 .day-header span{
   color:var(--text);
-  font-size:21px;
-  font-weight:900;
+  font-size:24px;
+  font-weight:950;
 }
 
 .event{
@@ -166,7 +166,7 @@ h1{
 .event:first-of-type{border-top:0}
 
 .event-time{
-  font-size:30px;
+  font-size:32px;
   font-weight:950;
   letter-spacing:-.8px;
 }
@@ -193,10 +193,10 @@ h1{
 .event-title{
   overflow:hidden;
   text-overflow:ellipsis;
-  font-size:30px;
+  font-size:34px;
   font-weight:950;
-  line-height:1.22;
-  letter-spacing:-.45px;
+  line-height:1.18;
+  letter-spacing:-.55px;
 }
 .event-meta{
   margin-top:8px;
@@ -211,12 +211,12 @@ h1{
 .badge{
   display:inline-flex;
   align-items:center;
-  padding:7px 12px;
+  padding:8px 14px;
   border-radius:999px;
   color:white;
-  font-size:14px;
+  font-size:15px;
   font-weight:950;
-  letter-spacing:.045em;
+  letter-spacing:.05em;
   text-transform:uppercase;
 }
 .badge-film{background:var(--blue)}

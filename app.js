@@ -374,9 +374,18 @@
 
     // Sztywne okno publikacji:
     // dzisiaj + kolejne dni, maksymalnie 14 dni łącznie.
-    const displayDays = Math.max(1, Number(SITE_CONFIG.displayDays) || 14);
+    const displayDays = Math.max(1, Number(SITE_CONFIG.displayDays) || 7);
     const windowEnd = addDays(today, displayDays);
     windowEnd.setHours(0,0,0,0);
+
+    // Informacja kontrolna na stronie: dokładny zakres 7 dni.
+    const lastVisibleDay = addDays(today, displayDays - 1);
+    const rangeText = document.getElementById("rangeText");
+    if (rangeText) {
+      const startLabel = `${today.getDate()} ${PL_MONTHS[today.getMonth()]}`;
+      const endLabel = `${lastVisibleDay.getDate()} ${PL_MONTHS[lastVisibleDay.getMonth()]}`;
+      rangeText.textContent = `Pokazujemy 7 dni: ${startLabel} – ${endLabel}`;
+    }
 
     const sorted = [...events]
       .filter(e => Number.isFinite(parseDateTime(e.date,e.time).getTime()))
