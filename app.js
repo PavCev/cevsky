@@ -5,10 +5,12 @@
     "Niedziela","Poniedziałek","Wtorek","Środa",
     "Czwartek","Piątek","Sobota"
   ];
+
   const PL_MONTHS = [
     "stycznia","lutego","marca","kwietnia","maja","czerwca",
     "lipca","sierpnia","września","października","listopada","grudnia"
   ];
+
   const TYPE_LABELS = {
     film:"▶ FILM",
     premiera:"◆ PREMIERA",
@@ -16,108 +18,6 @@
   };
 
   let countdownTimer = null;
-
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", quoted = false;
-
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-
-      if (quoted) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') {
-            field += '"';
-            i++;
-          } else {
-            quoted = false;
-          }
-        } else {
-          field += ch;
-        }
-      } else {
-        if (ch === '"') {
-          quoted = true;
-        } else if (ch === ",") {
-          row.push(field);
-          field = "";
-        } else if (ch === "\n") {
-          row.push(field.replace(/\r$/, ""));
-          rows.push(row);
-          row = [];
-          field = "";
-        } else {
-          field += ch;
-        }
-      }
-    }
-
-    row.push(field.replace(/\r$/, ""));
-    if (row.some(x => x !== "")) rows.push(row);
-    return rows;
-  }
-
-  function normalizeHeader(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  }
-
-  function csvToEvents(csv) {
-    const rows = parseCSV(csv);
-    if (rows.length < 2) return [];
-
-    const headers = rows[0].map(normalizeHeader);
-
-    const col = name => headers.indexOf(normalizeHeader(name));
-    const indexes = {
-      date: col("Data"),
-      time: col("Godzina"),
-      type: col("Typ"),
-      title: col("Tytuł"),
-      subtitle: col("Opis"),
-      url: col("Link YouTube"),
-      thumbnail: col("Miniatura"),
-      active: col("Aktywne")
-    };
-
-    if (indexes.date < 0 || indexes.time < 0 || indexes.title < 0) {
-      throw new Error("W arkuszu brakuje kolumn Data, Godzina lub Tytuł.");
-    }
-
-    return rows.slice(1).map(row => {
-      const get = idx => idx >= 0 ? String(row[idx] ?? "").trim() : "";
-      return {
-        date: get(indexes.date),
-        time: get(indexes.time),
-        type: get(indexes.type).toLowerCase(),
-        title: get(indexes.title),
-        subtitle: get(indexes.subtitle),
-        url: get(indexes.url),
-        thumbnail: get(indexes.thumbnail),
-        active: get(indexes.active)
-      };
-    }).filter(e => {
-      if (!e.date || !e.time || !e.title) return false;
-
-      const a = e.active.trim().toUpperCase();
-      if (!a) return true;
-
-      return ["TAK","TRUE","1","YES","Y"].includes(a);
-    });
-  }
-
-  function parseDateTime(dateStr, timeStr = "00:00") {
-    const [y,m,d] = dateStr.split("-").map(Number);
-    const [hh,mm] = timeStr.split(":").map(Number);
-
-    if (![y,m,d,hh,mm].every(Number.isFinite)) {
-      return new Date(NaN);
-    }
-    return new Date(y, m - 1, d, hh, mm, 0, 0);
-  }
 
   function startOfToday() {
     const d = new Date();
@@ -131,12 +31,147 @@
     return d;
   }
 
+  function pad2(v) {
+    return String(v).padStart(2,"0");
+  }
+
+  function dateToYMD(d) {
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function normalizeDate(value, formatted) {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return dateToYMD(value);
+    }
+
+    const raw = String(formatted || value || "").trim();
+
+    // YYYY-MM-DD
+    let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) {
+      return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
+    }
+
+    // DD.MM.YYYY
+    m = raw.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
+    if (m) {
+      return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
+    }
+
+    return raw;
+  }
+
+  function normalizeTime(value, formatted) {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return `${pad2(value.getHours())}:${pad2(value.getMinutes())}`;
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+      const totalMinutes = Math.round(value * 24 * 60);
+      return `${pad2(Math.floor(totalMinutes / 60) % 24)}:${pad2(totalMinutes % 60)}`;
+    }
+
+    const raw = String(formatted || value || "").trim();
+    const m = raw.match(/(\d{1,2}):(\d{2})/);
+    if (m) return `${pad2(m[1])}:${m[2]}`;
+
+    return raw;
+  }
+
+  function parseDateTime(dateStr, timeStr="00:00") {
+    const dm = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const tm = String(timeStr).match(/^(\d{1,2}):(\d{2})$/);
+
+    if (!dm || !tm) return new Date(NaN);
+
+    return new Date(
+      Number(dm[1]),
+      Number(dm[2]) - 1,
+      Number(dm[3]),
+      Number(tm[1]),
+      Number(tm[2]),
+      0, 0
+    );
+  }
+
   function formatDate(dateStr) {
     const d = parseDateTime(dateStr);
     return {
       dayName: PL_DAYS[d.getDay()],
       fullDate: `${d.getDate()} ${PL_MONTHS[d.getMonth()]}`
     };
+  }
+
+  function normalizeHeader(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function findColumn(table, wanted) {
+    const target = normalizeHeader(wanted);
+
+    for (let c = 0; c < table.getNumberOfColumns(); c++) {
+      if (normalizeHeader(table.getColumnLabel(c)) === target) return c;
+    }
+    return -1;
+  }
+
+  function getCell(table, row, col) {
+    if (col < 0) return { value:"", formatted:"" };
+
+    return {
+      value: table.getValue(row,col),
+      formatted: table.getFormattedValue(row,col)
+    };
+  }
+
+  function tableToEvents(table) {
+    const cols = {
+      date: findColumn(table,"Data"),
+      time: findColumn(table,"Godzina"),
+      type: findColumn(table,"Typ"),
+      title: findColumn(table,"Tytuł"),
+      subtitle: findColumn(table,"Opis"),
+      url: findColumn(table,"Link YouTube"),
+      thumbnail: findColumn(table,"Miniatura"),
+      active: findColumn(table,"Aktywne")
+    };
+
+    if (cols.date < 0 || cols.time < 0 || cols.title < 0) {
+      throw new Error("Brakuje wymaganych kolumn: Data, Godzina lub Tytuł.");
+    }
+
+    const events = [];
+
+    for (let r = 0; r < table.getNumberOfRows(); r++) {
+      const dateCell = getCell(table,r,cols.date);
+      const timeCell = getCell(table,r,cols.time);
+
+      const date = normalizeDate(dateCell.value,dateCell.formatted);
+      const time = normalizeTime(timeCell.value,timeCell.formatted);
+
+      const title = String(getCell(table,r,cols.title).formatted || getCell(table,r,cols.title).value || "").trim();
+      const type = String(getCell(table,r,cols.type).formatted || getCell(table,r,cols.type).value || "").trim().toLowerCase();
+      const subtitle = String(getCell(table,r,cols.subtitle).formatted || getCell(table,r,cols.subtitle).value || "").trim();
+      const url = String(getCell(table,r,cols.url).formatted || getCell(table,r,cols.url).value || "").trim();
+      const thumbnail = String(getCell(table,r,cols.thumbnail).formatted || getCell(table,r,cols.thumbnail).value || "").trim();
+      const active = String(getCell(table,r,cols.active).formatted || getCell(table,r,cols.active).value || "").trim().toUpperCase();
+
+      if (!date || !time || !title) continue;
+
+      if (active && !["TAK","TRUE","1","YES","Y"].includes(active)) {
+        continue;
+      }
+
+      events.push({
+        date, time, type, title, subtitle, url, thumbnail
+      });
+    }
+
+    return events;
   }
 
   function typeSafe(type) {
@@ -146,6 +181,7 @@
 
   function youtubeVideoId(url) {
     if (!url) return "";
+
     try {
       const u = new URL(url);
 
@@ -154,18 +190,23 @@
       }
 
       if (u.hostname.includes("youtube.com")) {
-        if (u.pathname === "/watch") return u.searchParams.get("v") || "";
+        if (u.pathname === "/watch") {
+          return u.searchParams.get("v") || "";
+        }
 
         const parts = u.pathname.split("/").filter(Boolean);
         const idx = parts.findIndex(x => ["shorts","live","embed"].includes(x));
-        if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+
+        if (idx >= 0 && parts[idx+1]) return parts[idx+1];
       }
     } catch (_) {}
+
     return "";
   }
 
   function getThumb(event) {
     if (event.thumbnail) return event.thumbnail;
+
     const id = youtubeVideoId(event.url);
     return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
   }
@@ -174,8 +215,8 @@
     const wrap = document.createElement("div");
     wrap.className = "thumb-wrap";
 
-    const thumb = getThumb(event);
     const type = typeSafe(event.type);
+    const thumb = getThumb(event);
 
     const fallback = () => {
       wrap.innerHTML = `
@@ -196,6 +237,7 @@
     img.alt = "";
     img.src = thumb;
     img.onerror = fallback;
+
     wrap.appendChild(img);
     return wrap;
   }
@@ -219,6 +261,7 @@
     meta.className = "event-meta";
 
     const type = typeSafe(event.type);
+
     const badge = document.createElement("span");
     badge.className = `badge badge-${type}`;
     badge.textContent = TYPE_LABELS[type];
@@ -325,21 +368,18 @@
     }
 
     tick();
-    countdownTimer = setInterval(tick, 60000);
+    countdownTimer = setInterval(tick,60000);
   }
 
   function renderData(events) {
     const today = startOfToday();
-    const keepFrom = addDays(today, -(SITE_CONFIG.keepPastDays || 0));
+    const keepFrom = addDays(today,-(SITE_CONFIG.keepPastDays || 0));
 
     const sorted = [...events]
-      .filter(e => {
-        const d = parseDateTime(e.date,e.time);
-        return Number.isFinite(d.getTime());
-      })
+      .filter(e => Number.isFinite(parseDateTime(e.date,e.time).getTime()))
       .sort((a,b) => parseDateTime(a.date,a.time) - parseDateTime(b.date,b.time));
 
-    // Pokazujemy wszystkie wpisy z dzisiejszego dnia, nawet jeżeli godzina już minęła.
+    // Zachowaj wszystkie dzisiejsze pozycje, także już zakończone.
     const visible = sorted.filter(e =>
       parseDateTime(e.date,"23:59").getTime() >= keepFrom.getTime()
     );
@@ -352,50 +392,62 @@
     updateNext(upcoming[0]);
   }
 
-  async function loadSheet() {
+  function showError(message) {
     const status = document.getElementById("sheetStatus");
+    status.textContent = "Błąd Google Sheets";
+    status.className = "sheet-status error";
+
+    document.getElementById("schedule").innerHTML =
+      `<div class="empty">${message}</div>`;
+
+    document.getElementById("nextDate").textContent = "—";
+    document.getElementById("nextTitle").textContent = "Harmonogram chwilowo niedostępny";
+    document.getElementById("nextCountdown").textContent = "";
+  }
+
+  function handleQueryResponse(response) {
+    if (response.isError()) {
+      showError(
+        `Nie udało się pobrać arkusza: ${response.getMessage()}`
+      );
+      return;
+    }
 
     try {
-      status.textContent = "Aktualizowanie harmonogramu…";
-      status.className = "sheet-status";
-
-      const sep = SITE_CONFIG.sheetCsvUrl.includes("?") ? "&" : "?";
-      const url = `${SITE_CONFIG.sheetCsvUrl}${sep}_=${Date.now()}`;
-
-      const response = await fetch(url, {
-        cache: "no-store",
-        redirect: "follow"
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const csv = await response.text();
-      const events = csvToEvents(csv);
+      const table = response.getDataTable();
+      const events = tableToEvents(table);
 
       renderData(events);
 
       const now = new Date();
-      const hh = String(now.getHours()).padStart(2,"0");
-      const mm = String(now.getMinutes()).padStart(2,"0");
+      const hh = pad2(now.getHours());
+      const mm = pad2(now.getMinutes());
 
+      const status = document.getElementById("sheetStatus");
       status.textContent = `Google Sheets • aktualizacja ${hh}:${mm}`;
       status.className = "sheet-status ok";
-    } catch (error) {
-      console.error("Błąd Google Sheets:", error);
+    } catch (err) {
+      console.error(err);
+      showError("Nie udało się odczytać danych z arkusza.");
+    }
+  }
 
-      status.textContent = "Nie udało się pobrać Google Sheets";
-      status.className = "sheet-status error";
+  function loadSheet() {
+    const status = document.getElementById("sheetStatus");
+    status.textContent = "Aktualizowanie harmonogramu…";
+    status.className = "sheet-status";
 
-      document.getElementById("schedule").innerHTML = `
-        <div class="empty">
-          Nie udało się teraz pobrać harmonogramu. Odśwież stronę za chwilę.
-        </div>`;
+    try {
+      const url =
+        `https://docs.google.com/spreadsheets/d/${SITE_CONFIG.sheetId}/gviz/tq` +
+        `?gid=${encodeURIComponent(SITE_CONFIG.sheetGid)}&headers=1`;
 
-      document.getElementById("nextDate").textContent = "—";
-      document.getElementById("nextTitle").textContent = "Harmonogram chwilowo niedostępny";
-      document.getElementById("nextCountdown").textContent = "";
+      const query = new google.visualization.Query(url);
+      query.setQuery("select *");
+      query.send(handleQueryResponse);
+    } catch (err) {
+      console.error(err);
+      showError("Nie udało się połączyć z Google Sheets.");
     }
   }
 
@@ -407,10 +459,13 @@
 
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    loadSheet();
+    google.charts.load("current", {packages:[]});
+    google.charts.setOnLoadCallback(() => {
+      loadSheet();
 
-    const minutes = Math.max(1, Number(SITE_CONFIG.refreshMinutes) || 2);
-    setInterval(loadSheet, minutes * 60 * 1000);
+      const minutes = Math.max(1,Number(SITE_CONFIG.refreshMinutes) || 2);
+      setInterval(loadSheet,minutes * 60 * 1000);
+    });
   }
 
   init();

@@ -1,16 +1,15 @@
 /*
-  CEVSKY.PL — ustawienia strony
-  Harmonogram jest pobierany automatycznie z Google Sheets.
+  CEVSKY.PL — Google Sheets v3.1
 */
 
 const SITE_CONFIG = {
   channelName: "Cevsky",
   youtubeUrl: "https://www.youtube.com/@Cevsky",
 
-  // Opublikowany arkusz "Harmonogram" jako CSV:
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo5zs1HPZBwgl8Rvrfoc5pR0Vr7KvdnMG_4dJfxImRjlJwh5sW9bTDkC2QANB8O8WodVlmJE0uk8p3/pub?gid=142894889&single=true&output=csv",
+  sheetId: "1LfXGq0jA0XW0Sx-JOVaYwT7dlaALyqu4Lv0rWqrDsmk",
+  sheetGid: "142894889",
 
-  // Co ile minut strona ma ponownie sprawdzić arkusz.
+  // Co ile minut ponownie pobrać dane z Google Sheets.
   refreshMinutes: 2,
 
   // 0 = pokazuj dzisiejszy dzień i przyszłość.
