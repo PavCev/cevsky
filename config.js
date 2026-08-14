@@ -1,5 +1,5 @@
 /*
-  CEVSKY.PL — Google Sheets v3.3
+  CEVSKY.PL — Google Sheets v3.4
 */
 
 const SITE_CONFIG = {
@@ -15,8 +15,8 @@ const SITE_CONFIG = {
   // 0 = pokazuj dzisiejszy dzień i przyszłość.
   keepPastDays: 0,
 
-  // Pokazuj wyłącznie 14 dni: dzisiaj + 13 kolejnych dni.
-  displayDays: 14,
+  // Pokazuj wyłącznie 7 dni: dzisiaj + 6 kolejnych dni.
+  displayDays: 7,
 
   // Tekst na przycisku, jeśli w arkuszu podasz link do playlisty / serii.
   seriesButtonText: "Seria ↗"
