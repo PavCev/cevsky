@@ -448,33 +448,45 @@
       return;
     }
 
+    const grouped=new Map();
+
     items.forEach(item=>{
-      const row=document.createElement("div");
-      row.className="release-item";
-
-      const date=document.createElement("div");
-      date.className="release-date";
-      date.textContent=formatReleaseDate(item.date);
-
-      const title=document.createElement("div");
-      title.className="release-title";
-      title.textContent=item.title;
-
-      row.appendChild(date);
-      row.appendChild(title);
-
-      if(item.steamUrl){
-        const a=document.createElement("a");
-        a.className="steam-link";
-        a.href=item.steamUrl;
-        a.target="_blank";
-        a.rel="noopener noreferrer";
-        a.textContent="Steam ↗";
-        row.appendChild(a);
-      }
-
-      container.appendChild(row);
+      if(!grouped.has(item.date)) grouped.set(item.date,[]);
+      grouped.get(item.date).push(item);
     });
+
+    for(const [date,dayItems] of grouped.entries()){
+      const d=parseDateTime(date);
+      const day=document.createElement("div");
+      day.className="release-day";
+
+      const dateHeader=document.createElement("div");
+      dateHeader.className="release-day-date";
+      dateHeader.innerHTML=
+        `<strong>${PL_DAYS[d.getDay()]}</strong><span>${pad2(d.getDate())}.${pad2(d.getMonth()+1)}</span>`;
+
+      const titles=document.createElement("div");
+      titles.className="release-day-items";
+
+      dayItems.forEach(item=>{
+        const el=document.createElement(item.steamUrl ? "a" : "div");
+        el.className=item.steamUrl ? "release-title-link" : "release-title-static";
+        el.textContent=item.title;
+
+        if(item.steamUrl){
+          el.href=item.steamUrl;
+          el.target="_blank";
+          el.rel="noopener noreferrer";
+          el.title=`Otwórz ${item.title} na Steam`;
+        }
+
+        titles.appendChild(el);
+      });
+
+      day.appendChild(dateHeader);
+      day.appendChild(titles);
+      container.appendChild(day);
+    }
   }
 
   function renderPremieres(items){
