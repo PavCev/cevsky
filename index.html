@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
 
   <title>Cevsky – Harmonogram filmów</title>
-  <meta name="description" content="Harmonogram najbliższych filmów, premier i transmisji na kanale Cevsky.">
+  <meta name="description" content="Harmonogram filmów i ciekawe premiery gier na kanale Cevsky.">
 
   <meta property="og:title" content="Cevsky – Harmonogram filmów">
   <meta property="og:description" content="Najbliższe filmy, premiery i transmisje na kanale Cevsky.">
@@ -15,7 +15,7 @@
   <meta property="og:url" content="https://cevsky.pl/">
   <link rel="canonical" href="https://cevsky.pl/">
 
-  <link rel="stylesheet" href="styles.css?v=3.6.0">
+  <link rel="stylesheet" href="styles.css?v=3.7.0">
 </head>
 <body>
   <header class="site-header">
@@ -59,22 +59,50 @@
       </aside>
     </section>
 
-    <section class="schedule-section">
-      <div class="section-heading">
-        <div>
-          <h2>Najbliższe dni</h2>
-          <p id="rangeText">Pokazujemy 7 dni</p>
+    <div class="content-layout">
+      <aside class="releases-sidebar">
+        <section class="release-panel">
+          <div class="release-panel-head">
+            <span class="release-kicker">STEAM</span>
+            <h2>Premiery tego tygodnia</h2>
+            <p id="currentWeekLabel"></p>
+          </div>
+          <div id="currentWeekReleases" class="release-list">
+            <div class="release-empty">Ładowanie…</div>
+          </div>
+        </section>
+
+        <section class="release-panel">
+          <div class="release-panel-head">
+            <span class="release-kicker">STEAM</span>
+            <h2>Premiery następnego tygodnia</h2>
+            <p id="nextWeekLabel"></p>
+          </div>
+          <div id="nextWeekReleases" class="release-list">
+            <div class="release-empty">Ładowanie…</div>
+          </div>
+        </section>
+
+        <div id="premieresStatus" class="sidebar-status">Ładowanie premier…</div>
+      </aside>
+
+      <section class="schedule-section">
+        <div class="section-heading">
+          <div>
+            <h2>Najbliższe dni</h2>
+            <p id="rangeText">Pokazujemy 7 dni</p>
+          </div>
+
+          <div class="status-area">
+            <span id="sheetStatus" class="sheet-status">Ładowanie z Google Sheets…</span>
+          </div>
         </div>
 
-        <div class="status-area">
-          <span id="sheetStatus" class="sheet-status">Ładowanie z Google Sheets…</span>
+        <div id="schedule" class="schedule" aria-live="polite">
+          <div class="empty">Ładowanie harmonogramu…</div>
         </div>
-      </div>
-
-      <div id="schedule" class="schedule" aria-live="polite">
-        <div class="empty">Ładowanie harmonogramu…</div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <footer class="footer container">
@@ -84,7 +112,7 @@
   </footer>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="config.js?v=3.6.0"></script>
-  <script src="app.js?v=3.6.0"></script>
+  <script src="config.js?v=3.7.0"></script>
+  <script src="app.js?v=3.7.0"></script>
 </body>
 </html>
