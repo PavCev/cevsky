@@ -36,8 +36,16 @@ a{color:inherit;text-decoration:none}
 }
 .button:hover{transform:translateY(-1px)}
 .button-light{background:#fff;color:#090b10}
-.button-nav{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055)}
-.button-nav:hover{background:rgba(255,255,255,.10)}
+.button-nav{
+  border:1px solid rgba(124,92,255,.42);
+  background:linear-gradient(135deg,rgba(124,92,255,.95),rgba(81,63,184,.95));
+  color:#fff;
+  box-shadow:0 8px 24px rgba(124,92,255,.24);
+}
+.button-nav:hover{
+  background:linear-gradient(135deg,rgba(143,113,255,1),rgba(98,78,205,1));
+  box-shadow:0 10px 28px rgba(124,92,255,.34);
+}
 .button-primary{background:var(--red);color:#fff}
 
 .hero{
