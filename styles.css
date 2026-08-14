@@ -193,10 +193,10 @@ h1{
 .event-title{
   overflow:hidden;
   text-overflow:ellipsis;
-  font-size:34px;
-  font-weight:950;
-  line-height:1.18;
-  letter-spacing:-.55px;
+  font-size:26px;
+  font-weight:900;
+  line-height:1.22;
+  letter-spacing:-.35px;
 }
 .event-meta{
   margin-top:8px;
@@ -211,12 +211,12 @@ h1{
 .badge{
   display:inline-flex;
   align-items:center;
-  padding:8px 14px;
+  padding:6px 11px;
   border-radius:999px;
   color:white;
-  font-size:15px;
+  font-size:12px;
   font-weight:950;
-  letter-spacing:.05em;
+  letter-spacing:.045em;
   text-transform:uppercase;
 }
 .badge-film{background:var(--blue)}
@@ -227,14 +227,24 @@ h1{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-width:126px;
-  padding:10px 14px;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:12px;
-  font-size:13px;
-  font-weight:900;
+  min-width:150px;
+  min-height:46px;
+  padding:11px 18px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:13px;
+  font-size:15px;
+  font-weight:950;
+  letter-spacing:.01em;
+  background:rgba(255,255,255,.06);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
 }
-a.open-link:hover{color:#0b0d12;border-color:white;background:white}
+a.open-link:hover{
+  color:#0b0d12;
+  border-color:white;
+  background:white;
+  transform:translateY(-1px);
+}
 
 .empty{
   padding:28px;border:1px solid var(--line);border-radius:18px;
@@ -275,11 +285,14 @@ a.open-link:hover{color:#0b0d12;border-color:white;background:white}
     padding:14px;
   }
   .event-time{font-size:24px}
-  .event-title{font-size:24px}
+  .event-title{font-size:22px}
   .open-link{
     grid-column:2;
     justify-self:start;
-    min-width:0;
+    min-width:132px;
+    min-height:42px;
+    font-size:14px;
+    padding:9px 15px;
   }
   .day-header{padding:0 14px}
 }
