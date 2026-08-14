@@ -46,17 +46,11 @@
 
     const raw = String(formatted || value || "").trim();
 
-    // YYYY-MM-DD
     let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (m) {
-      return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
-    }
+    if (m) return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
 
-    // DD.MM.YYYY
     m = raw.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
-    if (m) {
-      return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
-    }
+    if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
 
     return raw;
   }
@@ -81,7 +75,6 @@
   function parseDateTime(dateStr, timeStr="00:00") {
     const dm = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
     const tm = String(timeStr).match(/^(\d{1,2}):(\d{2})$/);
-
     if (!dm || !tm) return new Date(NaN);
 
     return new Date(
@@ -110,18 +103,19 @@
       .replace(/[\u0300-\u036f]/g, "");
   }
 
-  function findColumn(table, wanted) {
-    const target = normalizeHeader(wanted);
-
+  function findColumn(table, names) {
+    const list = Array.isArray(names) ? names : [names];
     for (let c = 0; c < table.getNumberOfColumns(); c++) {
-      if (normalizeHeader(table.getColumnLabel(c)) === target) return c;
+      const label = normalizeHeader(table.getColumnLabel(c));
+      if (list.some(name => normalizeHeader(name) === label)) {
+        return c;
+      }
     }
     return -1;
   }
 
   function getCell(table, row, col) {
     if (col < 0) return { value:"", formatted:"" };
-
     return {
       value: table.getValue(row,col),
       formatted: table.getFormattedValue(row,col)
@@ -135,7 +129,8 @@
       type: findColumn(table,"Typ"),
       title: findColumn(table,"Tytuł"),
       subtitle: findColumn(table,"Opis"),
-      url: findColumn(table,"Link YouTube"),
+      // obsługa starej i nowej nazwy kolumny:
+      seriesUrl: findColumn(table,["Link serii","Link playlisty","Link YouTube","Link"]),
       thumbnail: findColumn(table,"Miniatura"),
       active: findColumn(table,"Aktywne")
     };
@@ -156,18 +151,15 @@
       const title = String(getCell(table,r,cols.title).formatted || getCell(table,r,cols.title).value || "").trim();
       const type = String(getCell(table,r,cols.type).formatted || getCell(table,r,cols.type).value || "").trim().toLowerCase();
       const subtitle = String(getCell(table,r,cols.subtitle).formatted || getCell(table,r,cols.subtitle).value || "").trim();
-      const url = String(getCell(table,r,cols.url).formatted || getCell(table,r,cols.url).value || "").trim();
+      const seriesUrl = String(getCell(table,r,cols.seriesUrl).formatted || getCell(table,r,cols.seriesUrl).value || "").trim();
       const thumbnail = String(getCell(table,r,cols.thumbnail).formatted || getCell(table,r,cols.thumbnail).value || "").trim();
       const active = String(getCell(table,r,cols.active).formatted || getCell(table,r,cols.active).value || "").trim().toUpperCase();
 
       if (!date || !time || !title) continue;
-
-      if (active && !["TAK","TRUE","1","YES","Y"].includes(active)) {
-        continue;
-      }
+      if (active && !["TAK","TRUE","1","YES","Y"].includes(active)) continue;
 
       events.push({
-        date, time, type, title, subtitle, url, thumbnail
+        date, time, type, title, subtitle, seriesUrl, thumbnail
       });
     }
 
@@ -181,7 +173,6 @@
 
   function youtubeVideoId(url) {
     if (!url) return "";
-
     try {
       const u = new URL(url);
 
@@ -190,24 +181,34 @@
       }
 
       if (u.hostname.includes("youtube.com")) {
-        if (u.pathname === "/watch") {
-          return u.searchParams.get("v") || "";
-        }
+        if (u.pathname === "/watch") return u.searchParams.get("v") || "";
 
         const parts = u.pathname.split("/").filter(Boolean);
         const idx = parts.findIndex(x => ["shorts","live","embed"].includes(x));
-
         if (idx >= 0 && parts[idx+1]) return parts[idx+1];
       }
     } catch (_) {}
-
     return "";
   }
 
-  function getThumb(event) {
-    if (event.thumbnail) return event.thumbnail;
+  function resolveThumbPath(path) {
+    const value = String(path || "").trim();
+    if (!value) return "";
 
-    const id = youtubeVideoId(event.url);
+    if (/^(https?:)?\/\//i.test(value) || value.startsWith("data:") || value.startsWith("/")) {
+      return value;
+    }
+
+    // Relative path, np. "miniatury/nazwa.png"
+    return value;
+  }
+
+  function getThumb(event) {
+    if (event.thumbnail) return resolveThumbPath(event.thumbnail);
+
+    // Jeśli ktoś jednak wklei link YouTube do kolumny linku serii,
+    // miniatura też zadziała automatycznie.
+    const id = youtubeVideoId(event.seriesUrl);
     return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
   }
 
@@ -261,7 +262,6 @@
     meta.className = "event-meta";
 
     const type = typeSafe(event.type);
-
     const badge = document.createElement("span");
     badge.className = `badge badge-${type}`;
     badge.textContent = TYPE_LABELS[type];
@@ -276,12 +276,12 @@
     info.appendChild(title);
     info.appendChild(meta);
 
-    const link = document.createElement(event.url ? "a" : "span");
+    const link = document.createElement(event.seriesUrl ? "a" : "span");
     link.className = "open-link";
-    link.textContent = event.url ? "Otwórz ↗" : "Wkrótce";
+    link.textContent = event.seriesUrl ? (SITE_CONFIG.seriesButtonText || "Seria ↗") : "Wkrótce";
 
-    if (event.url) {
-      link.href = event.url;
+    if (event.seriesUrl) {
+      link.href = event.seriesUrl;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
     }
@@ -304,7 +304,6 @@
     }
 
     const groups = new Map();
-
     for (const event of events) {
       if (!groups.has(event.date)) groups.set(event.date, []);
       groups.get(event.date).push(event);
@@ -312,7 +311,6 @@
 
     for (const [date, dayEvents] of groups.entries()) {
       const label = formatDate(date);
-
       const card = document.createElement("article");
       card.className = "day-card";
 
@@ -379,7 +377,6 @@
       .filter(e => Number.isFinite(parseDateTime(e.date,e.time).getTime()))
       .sort((a,b) => parseDateTime(a.date,a.time) - parseDateTime(b.date,b.time));
 
-    // Zachowaj wszystkie dzisiejsze pozycje, także już zakończone.
     const visible = sorted.filter(e =>
       parseDateTime(e.date,"23:59").getTime() >= keepFrom.getTime()
     );
@@ -397,9 +394,7 @@
     status.textContent = "Błąd Google Sheets";
     status.className = "sheet-status error";
 
-    document.getElementById("schedule").innerHTML =
-      `<div class="empty">${message}</div>`;
-
+    document.getElementById("schedule").innerHTML = `<div class="empty">${message}</div>`;
     document.getElementById("nextDate").textContent = "—";
     document.getElementById("nextTitle").textContent = "Harmonogram chwilowo niedostępny";
     document.getElementById("nextCountdown").textContent = "";
@@ -407,9 +402,7 @@
 
   function handleQueryResponse(response) {
     if (response.isError()) {
-      showError(
-        `Nie udało się pobrać arkusza: ${response.getMessage()}`
-      );
+      showError(`Nie udało się pobrać arkusza: ${response.getMessage()}`);
       return;
     }
 
@@ -463,8 +456,8 @@
     google.charts.setOnLoadCallback(() => {
       loadSheet();
 
-      const minutes = Math.max(1,Number(SITE_CONFIG.refreshMinutes) || 2);
-      setInterval(loadSheet,minutes * 60 * 1000);
+      const minutes = Math.max(1, Number(SITE_CONFIG.refreshMinutes) || 2);
+      setInterval(loadSheet, minutes * 60 * 1000);
     });
   }
 
