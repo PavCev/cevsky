@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071019">
+  <title>Cevsky – Premiery gier</title>
+  <meta name="description" content="Ciekawe premiery gier tego i następnego tygodnia z linkami do Steam.">
+  <link rel="canonical" href="https://cevsky.pl/premiery/">
+  <link rel="stylesheet" href="premiery.css?v=4.0.0">
+</head>
+<body>
+<header class="site-header">
+  <div class="page topbar">
+    <a class="brand" href="../"><span class="logo">C</span><span><strong>Cevsky</strong><small>Premiery gier</small></span></a>
+    <div class="actions">
+      <a class="nav-btn" href="../">Harmonogram</a>
+      <a id="youtubeTop" class="nav-btn primary" href="#" target="_blank">YouTube ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="hero">
+    <span class="steam-tag">STEAM / PC</span>
+    <h1>Premiery gier</h1>
+    <p>Wybrane ciekawe premiery tego i następnego tygodnia. Kliknij tytuł, aby przejść bezpośrednio na Steam.</p>
+  </section>
+
+  <section class="weeks">
+    <article class="week current">
+      <header><div><span class="kicker">TERAZ</span><h2>Ten tydzień</h2></div><span id="currentWeekLabel" class="range"></span></header>
+      <div id="currentWeekReleases" class="days"><div class="empty">Ładowanie…</div></div>
+    </article>
+
+    <article class="week">
+      <header><div><span class="kicker">ZA CHWILĘ</span><h2>Następny tydzień</h2></div><span id="nextWeekLabel" class="range"></span></header>
+      <div id="nextWeekReleases" class="days"><div class="empty">Ładowanie…</div></div>
+    </article>
+  </section>
+
+  <div id="status" class="status">Ładowanie z Google Sheets…</div>
+</main>
+
+<footer class="footer page">© <span id="year"></span> Cevsky • <a href="../">Harmonogram</a></footer>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="../config.js?v=4.0.0"></script>
+<script src="premiery.js?v=4.0.0"></script>
+</body>
+</html>
