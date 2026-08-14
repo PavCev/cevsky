@@ -4,23 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b10">
-  <meta name="color-scheme" content="dark">
-
   <title>Cevsky – Harmonogram filmów</title>
-  <meta name="description" content="Harmonogram filmów i ciekawe premiery gier na kanale Cevsky.">
-
-  <meta property="og:title" content="Cevsky – Harmonogram filmów">
-  <meta property="og:description" content="Najbliższe filmy, premiery i transmisje na kanale Cevsky.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://cevsky.pl/">
+  <meta name="description" content="Harmonogram najbliższych filmów, premier i transmisji na kanale Cevsky.">
   <link rel="canonical" href="https://cevsky.pl/">
-
-  <link rel="stylesheet" href="styles.css?v=3.9.0">
+  <link rel="stylesheet" href="styles.css?v=4.0.0">
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="/" aria-label="Cevsky – strona główna">
+      <a class="brand" href="/">
         <span class="brand-mark">C</span>
         <span>
           <strong>Cevsky</strong>
@@ -28,9 +20,10 @@
         </span>
       </a>
 
-      <a id="youtubeTop" class="button button-light" href="#" target="_blank" rel="noopener noreferrer">
-        YouTube ↗
-      </a>
+      <div class="top-actions">
+        <a class="button button-nav" href="premiery/">Premiery</a>
+        <a id="youtubeTop" class="button button-light" href="#" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+      </div>
     </div>
   </header>
 
@@ -43,12 +36,7 @@
           Tutaj znajdziesz najbliższe filmy, premiery i transmisje na kanale Cevsky.
           Plan może się czasem zmienić — aktualna wersja jest zawsze tutaj.
         </p>
-
-        <div class="hero-links">
-          <a id="youtubeHero" class="button button-primary" href="#" target="_blank" rel="noopener noreferrer">
-            ▶ Kanał YouTube
-          </a>
-        </div>
+        <a id="youtubeHero" class="button button-primary" href="#" target="_blank" rel="noopener noreferrer">▶ Kanał YouTube</a>
       </div>
 
       <aside class="panel next-panel">
@@ -59,60 +47,31 @@
       </aside>
     </section>
 
-    <div class="content-layout">
-      <aside class="releases-sidebar">
-        <section class="release-panel">
-          <div class="release-panel-head">
-            <span class="release-kicker">STEAM</span>
-            <h2>Premiery tego tygodnia</h2>
-            <p id="currentWeekLabel"></p>
-          </div>
-          <div id="currentWeekReleases" class="release-list">
-            <div class="release-empty">Ładowanie…</div>
-          </div>
-        </section>
-
-        <section class="release-panel">
-          <div class="release-panel-head">
-            <span class="release-kicker">STEAM</span>
-            <h2>Premiery następnego tygodnia</h2>
-            <p id="nextWeekLabel"></p>
-          </div>
-          <div id="nextWeekReleases" class="release-list">
-            <div class="release-empty">Ładowanie…</div>
-          </div>
-        </section>
-
-        <div id="premieresStatus" class="sidebar-status">Ładowanie premier…</div>
-      </aside>
-
-      <section class="schedule-section">
-        <div class="section-heading">
-          <div>
-            <h2>Najbliższe dni</h2>
-            <p id="rangeText">Pokazujemy 7 dni</p>
-          </div>
-
-          <div class="status-area">
-            <span id="sheetStatus" class="sheet-status">Ładowanie z Google Sheets…</span>
-          </div>
+    <section class="schedule-section">
+      <div class="section-heading">
+        <div>
+          <h2>Najbliższe dni</h2>
+          <p id="rangeText">Pokazujemy 7 dni</p>
         </div>
+        <span id="sheetStatus" class="sheet-status">Ładowanie z Google Sheets…</span>
+      </div>
 
-        <div id="schedule" class="schedule" aria-live="polite">
-          <div class="empty">Ładowanie harmonogramu…</div>
-        </div>
-      </section>
-    </div>
+      <div id="schedule" class="schedule">
+        <div class="empty">Ładowanie harmonogramu…</div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer container">
     <span>© <span id="year"></span> Cevsky</span>
     <span>•</span>
+    <a href="premiery/">Premiery</a>
+    <span>•</span>
     <a id="youtubeFooter" href="#" target="_blank" rel="noopener noreferrer">YouTube</a>
   </footer>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="config.js?v=3.9.0"></script>
-  <script src="app.js?v=3.9.0"></script>
+  <script src="config.js?v=4.0.0"></script>
+  <script src="app.js?v=4.0.0"></script>
 </body>
 </html>
