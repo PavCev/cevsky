@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b10">
   <meta name="color-scheme" content="dark">
+
   <title>Cevsky – Harmonogram filmów</title>
   <meta name="description" content="Harmonogram najbliższych filmów, premier i transmisji na kanale Cevsky.">
+
   <meta property="og:title" content="Cevsky – Harmonogram filmów">
   <meta property="og:description" content="Najbliższe filmy, premiery i transmisje na kanale Cevsky.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://cevsky.pl/">
   <link rel="canonical" href="https://cevsky.pl/">
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,11 +28,9 @@
         </span>
       </a>
 
-      <nav class="nav-actions">
-        <a id="youtubeTop" class="button button-light" href="#" target="_blank" rel="noopener noreferrer">
-          YouTube ↗
-        </a>
-      </nav>
+      <a id="youtubeTop" class="button button-light" href="#" target="_blank" rel="noopener noreferrer">
+        YouTube ↗
+      </a>
     </div>
   </header>
 
@@ -42,6 +43,7 @@
           Tutaj znajdziesz najbliższe filmy, premiery i transmisje na kanale Cevsky.
           Plan może się czasem zmienić — aktualna wersja jest zawsze tutaj.
         </p>
+
         <div class="hero-links">
           <a id="youtubeHero" class="button button-primary" href="#" target="_blank" rel="noopener noreferrer">
             ▶ Kanał YouTube
@@ -52,7 +54,7 @@
       <aside class="panel next-panel">
         <p class="next-label">NAJBLIŻSZY MATERIAŁ</p>
         <div id="nextDate" class="next-date">—</div>
-        <div id="nextTitle" class="next-title">Brak zaplanowanych materiałów</div>
+        <div id="nextTitle" class="next-title">Ładowanie harmonogramu…</div>
         <div id="nextCountdown" class="next-countdown"></div>
       </aside>
     </section>
@@ -63,10 +65,16 @@
           <h2>Najbliższe dni</h2>
           <p>Aktualny plan publikacji</p>
         </div>
-        <div id="updatedAt" class="updated-at"></div>
+
+        <div class="status-area">
+          <span id="sheetStatus" class="sheet-status">Ładowanie z Google Sheets…</span>
+          <span id="updatedAt" class="updated-at"></span>
+        </div>
       </div>
 
-      <div id="schedule" class="schedule" aria-live="polite"></div>
+      <div id="schedule" class="schedule" aria-live="polite">
+        <div class="empty">Ładowanie harmonogramu…</div>
+      </div>
     </section>
   </main>
 
@@ -77,7 +85,6 @@
   </footer>
 
   <script src="config.js"></script>
-  <script src="schedule.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
